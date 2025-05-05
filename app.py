@@ -40,7 +40,7 @@ with col2:
     st.write("Di sini, Anda bisa melihat visualisasi lainnya.")
 
 # Menambahkan grafik interaktif
-fig = px.histogram(df, x="age", title="Distribusi Usia")
+fig = px.histogram(df, x="Age", title="Distribusi Usia")
 st.plotly_chart(fig)
 
 # Footer
