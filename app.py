@@ -1,39 +1,24 @@
 import os
-import pandas as pd
 import streamlit as st
 from kaggle.api.kaggle_api_extended import KaggleApi
 
-# Setup Kaggle API
-with open("/tmp/kaggle.json", "w") as f:
-    f.write(st.secrets["kaggle_json"])
-os.environ['KAGGLE_CONFIG_DIR'] = "/tmp"
+# Ambil dari secrets
+username = st.secrets["kaggle"]["username"]
+key = st.secrets["kaggle"]["key"]
 
-# Unduh dataset jika belum ada
-def download_dataset():
-    filename = "cirrhosis.csv"
-    if not os.path.exists(filename):
-        api = KaggleApi()
-        api.authenticate()
-        api.dataset_download_files("fedesoriano/cirrhosis-prediction-dataset", path=".", unzip=True)
+# Tulis ke ~/.kaggle/kaggle.json
+kaggle_path = os.path.expanduser("~/.kaggle")
+os.makedirs(kaggle_path, exist_ok=True)
 
-download_dataset()
+with open(os.path.join(kaggle_path, "kaggle.json"), "w") as f:
+    f.write(f"""{{
+        "username": "{username}",
+        "key": "{key}"
+    }}""")
 
-# Load data
-@st.cache_data
-def load_data():
-    df = pd.read_csv("cirrhosis.csv")
-    return df
+os.chmod(os.path.join(kaggle_path, "kaggle.json"), 0o600)
 
-df = load_data()
-
-# Aplikasi Streamlit
-st.title("Cirrhosis Prediction Dataset Viewer")
-
-st.write("Dataset berisi informasi medis terkait pasien sirosis.")
-st.dataframe(df.head())
-
-# Filter by Gender
-gender = st.selectbox("Filter berdasarkan Gender:", df["Gender"].dropna().unique())
-filtered_df = df[df["Gender"] == gender]
-st.write(f"Jumlah data untuk gender {gender}: {len(filtered_df)}")
-st.dataframe(filtered_df)
+# Autentikasi
+api = KaggleApi()
+api.authenticate()
+st.success("Berhasil terhubung ke Kaggle!")
