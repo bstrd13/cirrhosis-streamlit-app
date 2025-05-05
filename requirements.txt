@@ -1,5 +1,3 @@
 streamlit
-kaggle
 pandas
-matplotlib
-seaborn
+kaggle
