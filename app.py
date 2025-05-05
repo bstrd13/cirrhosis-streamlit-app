@@ -13,10 +13,19 @@ kaggle_token = {
 }
 
 # Tulis ke file kaggle.json
-os.makedirs(os.path.expanduser("~/.kaggle"), exist_ok=True)
-with open(os.path.expanduser("~/.kaggle/kaggle.json"), "w") as f:
+kaggle_json_path = os.path.expanduser("~/.kaggle/kaggle.json")
+os.makedirs(os.path.dirname(kaggle_json_path), exist_ok=True)
+
+with open(kaggle_json_path, "w") as f:
     json.dump(kaggle_token, f)
-os.chmod(os.path.expanduser("~/.kaggle/kaggle.json"), 0o600)
+
+# Pastikan file kaggle.json ada
+if os.path.exists(kaggle_json_path):
+    st.write("File kaggle.json berhasil disimpan.")
+else:
+    st.write("File kaggle.json tidak ditemukan! Cek penulisan.")
+    
+os.chmod(kaggle_json_path, 0o600)
 
 # Autentikasi ke Kaggle
 api = KaggleApi()
