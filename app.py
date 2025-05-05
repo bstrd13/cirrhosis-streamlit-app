@@ -24,7 +24,7 @@ st.dataframe(df, width=700)
 
 # Grafik distribusi usia
 fig, ax = plt.subplots()
-ax.hist(df["age"], bins=10, color="skyblue")
+ax.hist(df["Age"], bins=10, color="skyblue")
 ax.set_title("Distribusi Umur")
 st.pyplot(fig)
 
