@@ -1,39 +1,50 @@
-import os
-import pandas as pd
 import streamlit as st
-from kaggle.api.kaggle_api_extended import KaggleApi
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
 
-# Setup Kaggle API
-with open("/tmp/kaggle.json", "w") as f:
-    f.write(st.secrets["kaggle_json"])
-os.environ['KAGGLE_CONFIG_DIR'] = "/tmp"
+# Header dan deskripsi
+st.markdown("""
+# 🩺 Prediksi Sirosis Hati
+Aplikasi untuk memprediksi kemungkinan sirosis hati berdasarkan data medis. 
+Silakan lihat dataset dan jelajahi hasil prediksi di bawah ini.
+""")
 
-# Unduh dataset jika belum ada
-def download_dataset():
-    filename = "cirrhosis.csv"
-    if not os.path.exists(filename):
-        api = KaggleApi()
-        api.authenticate()
-        api.dataset_download_files("fedesoriano/cirrhosis-prediction-dataset", path=".", unzip=True)
+# Sidebar untuk input
+st.sidebar.header("Pengaturan Prediksi")
+age = st.sidebar.slider("Pilih usia:", 20, 100, 30)
+gender = st.sidebar.radio("Jenis Kelamin:", ("Laki-laki", "Perempuan"))
 
-download_dataset()
+# Membaca dan menampilkan dataset
+df = pd.read_csv("data/cirrhosis.csv")
 
-# Load data
-@st.cache_data
-def load_data():
-    df = pd.read_csv("cirrhosis.csv")
-    return df
+# Menampilkan dataframe
+st.subheader("Dataset Sirosis Hati")
+st.dataframe(df, width=700)
 
-df = load_data()
+# Grafik distribusi usia
+fig, ax = plt.subplots()
+ax.hist(df["age"], bins=10, color="skyblue")
+ax.set_title("Distribusi Umur")
+st.pyplot(fig)
 
-# Aplikasi Streamlit
-st.title("Cirrhosis Prediction Dataset Viewer")
+# Kolom untuk tampilan terpisah
+col1, col2 = st.columns(2)
 
-st.write("Dataset berisi informasi medis terkait pasien sirosis.")
-st.dataframe(df.head())
+with col1:
+    st.header("Informasi Tambahan")
+    st.write("Dataset ini berisi data medis terkait dengan sirosis hati.")
+    
+with col2:
+    st.header("Grafik Lainnya")
+    st.write("Di sini, Anda bisa melihat visualisasi lainnya.")
 
-# Filter by Gender
-gender = st.selectbox("Filter berdasarkan Gender:", df["Gender"].dropna().unique())
-filtered_df = df[df["Gender"] == gender]
-st.write(f"Jumlah data untuk gender {gender}: {len(filtered_df)}")
-st.dataframe(filtered_df)
+# Menambahkan grafik interaktif
+fig = px.histogram(df, x="age", title="Distribusi Usia")
+st.plotly_chart(fig)
+
+# Footer
+st.markdown("""
+---
+Made with ❤️ by [ahmad mulyana](https://github.com/bstrd13)
+""")
